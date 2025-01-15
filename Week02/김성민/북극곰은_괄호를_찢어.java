@@ -1,79 +1,62 @@
 package beakjoon_25918;
 
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 
-public class 북극곰은_괄호를_찢어 {
+public class 북금곰은_괄호를_찢어 {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // 입력 받기
-        System.out.print("문자열의 길이는: ");
-        int n = scanner.nextInt();
-        System.out.print("문자열은: ");
-        String target = scanner.next();
+        // 문자열의 길이 N과 문자열 S를 입력받기
+        String str;
+        int len = 0;
+        while (true) {
+            System.out.print("문자열의 길이는 : ");
+            len = scanner.nextInt();
 
-        // 목표 문자열 검증
-        if (target.length() != n || !isValidParentheses(target)) {
-            System.out.println("올바른 길이와 괄호 문자열을 입력하세요.");
-            return;
+            System.out.print("문자열은 : ");
+            str = scanner.next();
+
+            if (str.length() == len) break;
+            System.out.println("다시 입력하세요(입력된 문자열과 길이가 다릅니다)");
         }
 
-        // 초기값 설정
-        String current = ""; // 현재 문자열
-        int days = 0;         // 며칠이 걸렸는지
+        List<Character> arrList = new ArrayList<>();
 
-        while (!current.equals(target)) {
-            days++;
-            Stack<Character> stack = new Stack<>();
-            StringBuilder night = new StringBuilder();
+        Stack<Character> stack = new Stack<>();
+        int day = 1;
 
-            // 밤에 필요한 문자를 추가
-            for (int i = 0; i < target.length(); i++) {
-                if (i >= current.length() || current.charAt(i) != target.charAt(i)) {
-                    night.append(target.charAt(i));
+        // List에 문자열 추가하기
+        for (char ch : str.toCharArray()) {
+            arrList.add(ch);
+        }
+
+        while (true) {
+            // 스택에 문자열 push하기
+            for (char ch : arrList) {
+                stack.push(ch);
+            }
+            System.out.println("stack = " + stack);
+
+            // 스택에 문자열 pop하기
+            List<Character> tempList = new ArrayList<>();
+
+            while (!stack.isEmpty()) {
+                char current = stack.pop();
+                if (!stack.isEmpty() && current != stack.peek()) {
+                    stack.pop();
                 } else {
-                    night.append(' '); // 동일한 부분은 그대로 둠
+                    tempList.add(current);
                 }
             }
 
-            // 낮에 북극곰이 찢는 행동을 스택으로 구현
-            for (char c : (current + night.toString()).toCharArray()) {
-                if (c != ' ') {
-                    if (!stack.isEmpty() && stack.peek() == '(' && c == ')') {
-                        stack.pop(); // ()를 제거
-                    } else {
-                        stack.push(c);
-                    }
-                }
-            }
+            Collections.reverse(tempList); // 순서 복구
+            arrList = tempList;
 
-            // 스택을 기반으로 새로운 문자열 생성
-            StringBuilder newCurrent = new StringBuilder();
-            for (char c : stack) {
-                newCurrent.append(c);
-            }
-            current = newCurrent.toString();
+            if (arrList.isEmpty()) break;
+
+            day++;
         }
 
-        System.out.println("최소 며칠이 걸렸는지: " + days);
-    }
-
-    // 유효한 괄호 문자열인지 확인
-    private static boolean isValidParentheses(String s) {
-        int balance = 0;
-        for (char c : s.toCharArray()) {
-            if (c == '(') {
-                balance++;
-            } else if (c == ')') {
-                balance--;
-                if (balance < 0) {
-                    return false;
-                }
-            } else {
-                return false; // 유효하지 않은 문자
-            }
-        }
-        return balance == 0;
+        System.out.println("day = " + day);
     }
 }
